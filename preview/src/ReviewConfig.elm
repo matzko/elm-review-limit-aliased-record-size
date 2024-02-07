@@ -18,4 +18,5 @@ import Review.Rule exposing (Rule)
 config : List Rule
 config =
     [ LimitAliasedRecordSize.rule
+        (20 |> LimitAliasedRecordSize.maxRecordSize)
     ]
