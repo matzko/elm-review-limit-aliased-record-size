@@ -53,8 +53,8 @@ If neither of the above commands indicates a problem, and you have not experienc
 -}
 
 import Elm.Syntax.Declaration exposing (Declaration(..))
-import Elm.Syntax.Node as Node exposing (Node)
-import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
+import Elm.Syntax.Node as Node exposing (Node(..))
+import Elm.Syntax.TypeAnnotation exposing (RecordDefinition, TypeAnnotation(..))
 import Review.Rule as Rule exposing (Rule)
 
 
@@ -178,6 +178,28 @@ maxRecordSize maxSize =
     LimitRecordSizeConfig { maxSize = maxSize }
 
 
+{-| Create an error message when a record alias has too many fields.
+-}
+errorMessaging : Int -> Node String -> RecordDefinition -> ( List (Rule.Error {}), () )
+errorMessaging maxSize name recordDefinition =
+    if List.length recordDefinition > maxSize then
+        let
+            message : String
+            message =
+                "Type alias `" ++ (name |> Node.value) ++ "` has " ++ String.fromInt (recordDefinition |> List.length) ++ " fields, which exceeds the maximum of " ++ String.fromInt maxSize ++ "."
+
+            details : List String
+            details =
+                [ "Type aliases with too many fields can cause performance issues at compile time."
+                , "Consider changing the alias to a custom type, e.g. type " ++ (name |> Node.value) ++ " = " ++ (name |> Node.value) ++ " { ... }"
+                ]
+        in
+        ( [ Rule.error { message = message, details = details } (Node.range name) ], () )
+
+    else
+        ( [], () )
+
+
 {-| A visitor for starting to parse declarations.
 -}
 declarationVisitor : Int -> Node Declaration -> () -> ( List (Rule.Error {}), () )
@@ -186,22 +208,10 @@ declarationVisitor maxSize node _ =
         AliasDeclaration { name, typeAnnotation } ->
             case typeAnnotation |> Node.value of
                 Record recordDefinition ->
-                    if List.length recordDefinition > maxSize then
-                        let
-                            message : String
-                            message =
-                                "Type alias `" ++ (name |> Node.value) ++ "` has " ++ String.fromInt (List.length recordDefinition) ++ " fields, which exceeds the maximum of " ++ String.fromInt maxSize ++ "."
+                    errorMessaging maxSize name recordDefinition
 
-                            details : List String
-                            details =
-                                [ "Type aliases with too many fields can cause performance issues at compile time."
-                                , "Consider changing the alias to a custom type, e.g. type " ++ (name |> Node.value) ++ " = " ++ (name |> Node.value) ++ " { ... }"
-                                ]
-                        in
-                        ( [ Rule.error { message = message, details = details } (Node.range name) ], () )
-
-                    else
-                        ( [], () )
+                GenericRecord _ (Node _ recordDefinition) ->
+                    errorMessaging maxSize name recordDefinition
 
                 _ ->
                     ( [], () )
