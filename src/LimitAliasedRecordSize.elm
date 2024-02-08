@@ -106,17 +106,10 @@ elm-review --template matzko/elm-review-limit-aliased-record-size/example
 
 -}
 rule : LimitRecordSizeConfig -> Rule
-rule config =
-    Rule.newModuleRuleSchemaUsingContextCreator "LimitAliasedRecordSize" (initialContext config)
-        |> Rule.withDeclarationEnterVisitor declarationVisitor
+rule (LimitRecordSizeConfig { maxSize }) =
+    Rule.newModuleRuleSchemaUsingContextCreator "LimitAliasedRecordSize" (Rule.initContextCreator (\() -> ()))
+        |> Rule.withDeclarationEnterVisitor (declarationVisitor maxSize)
         |> Rule.fromModuleRuleSchema
-
-
-{-| The context for the rule.
--}
-type alias Context =
-    { config : { maxSize : Int }
-    }
 
 
 {-| `LimitRecordSizeConfig` gets passed to `rule` to configure the rule. You can't contruct this type directly, but you can use the `maxRecordSize` function to create a configuration value:
@@ -152,29 +145,19 @@ maxRecordSize maxSize =
     LimitRecordSizeConfig { maxSize = maxSize }
 
 
-{-| The initial context for the rule.
--}
-initialContext : LimitRecordSizeConfig -> Rule.ContextCreator () Context
-initialContext (LimitRecordSizeConfig { maxSize }) =
-    Rule.initContextCreator
-        (\() ->
-            { config = { maxSize = maxSize } }
-        )
-
-
 {-| A visitor for starting to parse declarations.
 -}
-declarationVisitor : Node Declaration -> Context -> ( List (Rule.Error {}), Context )
-declarationVisitor node ({ config } as context) =
+declarationVisitor : Int -> Node Declaration -> () -> ( List (Rule.Error {}), () )
+declarationVisitor maxSize node _ =
     case Node.value node of
         AliasDeclaration { name, typeAnnotation } ->
             case typeAnnotation |> Node.value of
                 Record recordDefinition ->
-                    if List.length recordDefinition > config.maxSize then
+                    if List.length recordDefinition > maxSize then
                         let
                             message : String
                             message =
-                                "Type alias `" ++ (name |> Node.value) ++ "` has " ++ String.fromInt (List.length recordDefinition) ++ " fields, which exceeds the maximum of " ++ String.fromInt config.maxSize ++ "."
+                                "Type alias `" ++ (name |> Node.value) ++ "` has " ++ String.fromInt (List.length recordDefinition) ++ " fields, which exceeds the maximum of " ++ String.fromInt maxSize ++ "."
 
                             details : List String
                             details =
@@ -182,13 +165,13 @@ declarationVisitor node ({ config } as context) =
                                 , "Consider changing the alias to a custom type, e.g. type " ++ (name |> Node.value) ++ " = " ++ (name |> Node.value) ++ " { ... }"
                                 ]
                         in
-                        ( [ Rule.error { message = message, details = details } (Node.range node) ], context )
+                        ( [ Rule.error { message = message, details = details } (Node.range node) ], () )
 
                     else
-                        ( [], context )
+                        ( [], () )
 
                 _ ->
-                    ( [], context )
+                    ( [], () )
 
         _ ->
-            ( [], context )
+            ( [], () )
