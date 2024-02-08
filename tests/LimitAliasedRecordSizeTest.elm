@@ -5,28 +5,6 @@ import Review.Test
 import Test exposing (Test, describe, test)
 
 
-sampleUnder : String
-sampleUnder =
-    """type alias MyRecord = {
-    oneField : Int
-    , anotherField : String
-    , yetAnotherField : Bool
-    , andAnotherField : Int
-    , andAnotherField2 : Int
-    , andAnotherField3 : Int
-    , andAnotherField4 : Int
-    , andAnotherField5 : Int
-    , andAnotherField6 : Int
-    , andAnotherField7 : Int
-    , andAnotherField8 : Int
-    , andAnotherField9 : Int
-    , andAnotherField10 : Int
-    , andAnotherField11 : Int
-    , andAnotherField12 : Int
-    , andAnotherField13 : Int
-}"""
-
-
 all : Test
 all =
     describe "LimitAliasedRecordSize"
@@ -74,7 +52,7 @@ type alias MyRecord = {
                                 [ "Type aliases with too many fields can cause performance issues at compile time."
                                 , "Consider changing the alias to a custom type, e.g. type MyRecord = MyRecord { ... }"
                                 ]
-                            , under = sampleUnder
+                            , under = "MyRecord"
                             }
                         ]
         , test "should not report an error when there are a lot of fields but the max is higher" <|

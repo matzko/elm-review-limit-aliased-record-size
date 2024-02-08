@@ -198,7 +198,7 @@ declarationVisitor maxSize node _ =
                                 , "Consider changing the alias to a custom type, e.g. type " ++ (name |> Node.value) ++ " = " ++ (name |> Node.value) ++ " { ... }"
                                 ]
                         in
-                        ( [ Rule.error { message = message, details = details } (Node.range node) ], () )
+                        ( [ Rule.error { message = message, details = details } (Node.range name) ], () )
 
                     else
                         ( [], () )
