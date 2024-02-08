@@ -28,7 +28,7 @@ If the largest `.elmi` files are run more than a few megabytes, you might benefi
 
 ### When not to use this rule
 
-If neither of the above commands indicates a problem, and you have not experience problems with slow build times or exhausted memory when compiling, you probably don't need this rule.
+If neither of the above commands indicates a problem, and you have not experienced problems with slow build times or exhausted memory when compiling, you probably don't need this rule.
 
 ## Provided rules
 
