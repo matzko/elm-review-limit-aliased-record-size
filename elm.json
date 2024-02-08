@@ -1,7 +1,7 @@
 {
     "type": "package",
     "name": "matzko/elm-review-limit-aliased-record-size",
-    "summary": "",
+    "summary": "An elm-review rule to make sure aliased records don't get too large.",
     "license": "BSD-3-Clause",
     "version": "1.0.0",
     "exposed-modules": [
