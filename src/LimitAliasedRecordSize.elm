@@ -7,6 +7,39 @@ module LimitAliasedRecordSize exposing
 {-|
 
 
+# Motivation for the Rule
+
+`LimitAliasedRecordSize` provides an [`elm-review`](https://package.elm-lang.org/packages/jfmengels/elm-review/latest/) rule to make sure aliased records don't get too large.
+
+Experience has shown that having large record aliases (for me, more than 40 fields) can lead to large memory usage when compiling (sometimes up to 10GB).
+
+The purpose of this rule is to identify large alias records, so they can be replaced.
+
+
+## How to tell if you might need this rule
+
+Compile your application and look at the verbose output like so:
+
+```bash
+    elm make src / Main.elm --output=/dev/null +RTS -s -w
+```
+
+If garbage collection (GC) time is multiple seconds, or if the "bytes allocated in the heap" run to many gigabytes, you might benefit from this rule.
+
+After compilation, run
+
+```bash
+    du -hs elm-stuff/0.19.1/* | sort -h | tail -n 60 | tac
+```
+
+If the largest `.elmi` files are run more than a few megabytes, you might benefit from this rule.
+
+
+## When not to use this rule
+
+If neither of the above commands indicates a problem, and you have not experience problems with slow build times or exhausted memory when compiling, you probably don't need this rule.
+
+
 # Configuration
 
 @docs LimitRecordSizeConfig
