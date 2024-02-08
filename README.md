@@ -32,7 +32,7 @@ If neither of the above commands indicates a problem, and you have not experienc
 
 ## Provided rules
 
-- [`LimitAliasedRecordSize`](https://package.elm-lang.org/packages/matzko/elm-review-limit-aliased-record-size/1.0.1/LimitAliasedRecordSize/) - Reports aliased records that are larger than the given configured size.
+- [`LimitAliasedRecordSize`](https://package.elm-lang.org/packages/matzko/elm-review-limit-aliased-record-size/1.0.2/LimitAliasedRecordSize/) - Reports aliased records that are larger than the given configured size.
 
 ## Configuration
 
