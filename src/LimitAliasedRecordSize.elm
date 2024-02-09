@@ -29,7 +29,7 @@ If garbage collection (GC) time is multiple seconds, or if the "bytes allocated 
 After compilation, run
 
 ```bash
-    du -hs elm-stuff/0.19.1/* | sort -h | tail -n 60 | tac
+    du -hs elm-stuff/0.19.1/* | sort -hr | head -n 60
 ```
 
 If the largest `.elmi` files are run more than a few megabytes, you might benefit from this rule.
